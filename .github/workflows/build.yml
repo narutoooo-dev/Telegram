@@ -37,6 +37,8 @@ jobs:
     - name: Create dummy keystore
       run: |
         mkdir -p TMessagesProj/config
+        # حذف الـ keystore القديم إذا كان موجوداً
+        rm -f TMessagesProj/config/release.keystore
         keytool -genkey -v -keystore TMessagesProj/config/release.keystore \
           -alias androidkey \
           -keyalg RSA \
@@ -49,7 +51,6 @@ jobs:
 
     - name: Update gradle.properties with your credentials
       run: |
-        # نعدل ملف gradle.properties لاستخدام بياناتك
         sed -i 's/RELEASE_STORE_PASSWORD=.*/RELEASE_STORE_PASSWORD=android/' gradle.properties
         sed -i 's/RELEASE_KEY_PASSWORD=.*/RELEASE_KEY_PASSWORD=android/' gradle.properties
         sed -i 's/RELEASE_KEY_ALIAS=.*/RELEASE_KEY_ALIAS=androidkey/' gradle.properties
