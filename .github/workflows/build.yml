@@ -38,20 +38,20 @@ jobs:
       run: |
         mkdir -p TMessagesProj/config
         keytool -genkey -v -keystore TMessagesProj/config/release.keystore \
-          -alias telegram \
+          -alias naruto \
           -keyalg RSA \
           -keysize 2048 \
           -validity 10000 \
-          -storepass android \
-          -keypass android \
+          -storepass 1111 \
+          -keypass 1111 \
           -dname "CN=Android, OU=Android, O=Android, L=Unknown, ST=Unknown, C=US" \
           -noprompt
 
     - name: Build with Gradle
       env:
-        RELEASE_STORE_PASSWORD: android
-        RELEASE_KEY_PASSWORD: android
-        RELEASE_KEY_ALIAS: telegram
+        RELEASE_STORE_PASSWORD: 1111
+        RELEASE_KEY_PASSWORD: 1111
+        RELEASE_KEY_ALIAS: naruto
       run: ./gradlew assembleStandaloneRelease --stacktrace
 
     - name: Upload APK
