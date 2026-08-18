@@ -571,12 +571,9 @@ public class UserConfig extends BaseController {
         }
     }
 
+    // ✅ تم التعديل: تفعيل الـ Premium دائماً
     public boolean isPremium() {
-        TLRPC.User user = currentUser;
-        if (user == null) {
-            return false;
-        }
-        return user.premium;
+        return true;  // دايمًا رجع true عشان الميزات المدفوعة
     }
 
     public Long getEmojiStatus() {
