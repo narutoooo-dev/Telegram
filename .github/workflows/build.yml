@@ -38,20 +38,27 @@ jobs:
       run: |
         mkdir -p TMessagesProj/config
         keytool -genkey -v -keystore TMessagesProj/config/release.keystore \
-          -alias naruto \
+          -alias androidkey \
           -keyalg RSA \
           -keysize 2048 \
           -validity 10000 \
-          -storepass 1111 \
-          -keypass 1111 \
-          -dname "CN=Android, OU=Android, O=Android, L=Unknown, ST=Unknown, C=US" \
+          -storepass android \
+          -keypass android \
+          -dname "CN=Telegram Android, OU=Development, O=Telegram, L=San Francisco, ST=CA, C=US" \
           -noprompt
+
+    - name: Update gradle.properties with your credentials
+      run: |
+        # نعدل ملف gradle.properties لاستخدام بياناتك
+        sed -i 's/RELEASE_STORE_PASSWORD=.*/RELEASE_STORE_PASSWORD=android/' gradle.properties
+        sed -i 's/RELEASE_KEY_PASSWORD=.*/RELEASE_KEY_PASSWORD=android/' gradle.properties
+        sed -i 's/RELEASE_KEY_ALIAS=.*/RELEASE_KEY_ALIAS=androidkey/' gradle.properties
 
     - name: Build with Gradle
       env:
-        RELEASE_STORE_PASSWORD: 1111
-        RELEASE_KEY_PASSWORD: 1111
-        RELEASE_KEY_ALIAS: naruto
+        RELEASE_STORE_PASSWORD: android
+        RELEASE_KEY_PASSWORD: android
+        RELEASE_KEY_ALIAS: androidkey
       run: ./gradlew assembleStandaloneRelease --stacktrace
 
     - name: Upload APK
