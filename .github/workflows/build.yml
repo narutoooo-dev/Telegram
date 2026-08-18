@@ -66,9 +66,19 @@ jobs:
         RELEASE_KEY_ALIAS: androidkey
       run: ./gradlew :TMessagesProj_AppStandalone:assembleRelease --stacktrace
 
+    - name: Find APK files
+      run: |
+        echo "Searching for APK files..."
+        find . -name "*.apk" -type f
+        echo "=== APK locations with size ==="
+        find . -name "*.apk" -type f -exec ls -lh {} \;
+
     - name: Upload APK
       if: success()
       uses: actions/upload-artifact@v4
       with:
         name: telegram-apk
-        path: TMessagesProj_AppStandalone/build/outputs/apk/release/*.apk
+        path: |
+          TMessagesProj_AppStandalone/build/outputs/apk/**/*.apk
+          TMessagesProj/build/outputs/apk/**/*.apk
+          **/build/outputs/apk/**/*.apk
