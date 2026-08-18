@@ -54,38 +54,25 @@ jobs:
         sed -i 's/RELEASE_KEY_PASSWORD=.*/RELEASE_KEY_PASSWORD=android/' gradle.properties
         sed -i 's/RELEASE_KEY_ALIAS=.*/RELEASE_KEY_ALIAS=androidkey/' gradle.properties
 
-    - name: Update BuildVars with your API credentials
+    - name: Update BuildVars with API credentials
       run: |
+        # تحديث API credentials فقط
         sed -i 's/public static int APP_ID = .*/public static int APP_ID = 26333172;/' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
         sed -i 's/public static String APP_HASH = .*/public static String APP_HASH = "2a031a551da8ca175b0225eac8a2a131";/' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
-        
-        # تصحيح اسم التطبيق في BuildVars
-        sed -i 's/public static String APPLICATION_NAME = .*/public static String APPLICATION_NAME = "Telegram";/' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
-
-    - name: Fix application name (FINAL FIX)
-      run: |
-        # 1. تعديل ApplicationLoader.java - المصدر الرئيسي للمشكلة
-        sed -i 's/ApplicationLoaderImpl/Telegram/g' TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java
-        sed -i 's/ApiplicationLoaderImpl/Telegram/g' TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java
-        
-        # 2. تعديل AndroidManifest.xml
-        sed -i 's/android:label=".*"/android:label="@string\/app_name"/' TMessagesProj/src/main/AndroidManifest.xml
-        sed -i 's/android:name=".*ApplicationLoaderImpl"/android:name=".Telegram"/' TMessagesProj/src/main/AndroidManifest.xml
-        
-        # 3. تعديل جميع ملفات strings.xml
-        find TMessagesProj/src/main/res -name "strings.xml" -exec sed -i 's/<string name="app_name">.*<\/string>/<string name="app_name">Telegram<\/string>/g' {} \;
-        
-        # 4. التأكد من وجود الأيقونات
-        echo "✅ All fixes applied - App name should now be 'Telegram'"
 
     - name: Build with Gradle
       env:
         RELEASE_STORE_PASSWORD: android
         RELEASE_KEY_PASSWORD: android
         RELEASE_KEY_ALIAS: androidkey
-      run: ./gradlew :TMessagesProj_AppStandalone:assembleRelease --stacktrace
+      run: |
+        # تنظيف البناء أولاً
+        ./gradlew clean
+        # ثم البناء مع تفاصيل أكثر
+        ./gradlew :TMessagesProj_AppStandalone:assembleRelease --stacktrace --info
 
     - name: Find APK files
+      if: always()
       run: |
         echo "Searching for APK files..."
         find . -name "*.apk" -type f
@@ -101,3 +88,12 @@ jobs:
           TMessagesProj_AppStandalone/build/outputs/apk/**/*.apk
           TMessagesProj/build/outputs/apk/**/*.apk
           **/build/outputs/apk/**/*.apk
+
+    - name: Upload build logs on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: |
+          build/reports/
+          build/outputs/logs/
