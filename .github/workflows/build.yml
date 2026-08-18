@@ -37,7 +37,6 @@ jobs:
     - name: Create dummy keystore
       run: |
         mkdir -p TMessagesProj/config
-        # حذف الـ keystore القديم إذا كان موجوداً
         rm -f TMessagesProj/config/release.keystore
         keytool -genkey -v -keystore TMessagesProj/config/release.keystore \
           -alias androidkey \
@@ -49,20 +48,23 @@ jobs:
           -dname "CN=Telegram Android, OU=Development, O=Telegram, L=San Francisco, ST=CA, C=US" \
           -noprompt
 
-    - name: Update gradle.properties with your credentials
+    - name: Update gradle.properties
       run: |
         sed -i 's/RELEASE_STORE_PASSWORD=.*/RELEASE_STORE_PASSWORD=android/' gradle.properties
         sed -i 's/RELEASE_KEY_PASSWORD=.*/RELEASE_KEY_PASSWORD=android/' gradle.properties
         sed -i 's/RELEASE_KEY_ALIAS=.*/RELEASE_KEY_ALIAS=androidkey/' gradle.properties
 
-    - name: Build with Gradle
+    - name: Build with Gradle (with full logs)
       env:
         RELEASE_STORE_PASSWORD: android
         RELEASE_KEY_PASSWORD: android
         RELEASE_KEY_ALIAS: androidkey
-      run: ./gradlew assembleStandaloneRelease --stacktrace
+      run: |
+        # تشغيل البناء مع خيارات تصحيح شاملة
+        ./gradlew assembleStandaloneRelease --stacktrace --info --no-daemon
 
     - name: Upload APK
+      if: success()  # فقط إذا نجح البناء
       uses: actions/upload-artifact@v4
       with:
         name: telegram-apk
