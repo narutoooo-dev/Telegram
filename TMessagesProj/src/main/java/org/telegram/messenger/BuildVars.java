@@ -28,6 +28,7 @@ public class BuildVars {
 
     public static int APP_ID = 26333172;
     public static String APP_HASH = "2a031a551da8ca175b0225eac8a2a131";
+    public static String APPLICATION_NAME = "Telegram";
 
     // SafetyNet key for Google Identity SDK, set it to empty to disable
     public static String SAFETYNET_KEY = "AIzaSyDqt8P-7F7CPCseMkOiVRgb1LY8RN1bvH8";
