@@ -56,17 +56,38 @@ jobs:
 
     - name: Update BuildVars with your API credentials
       run: |
-        # تحديث APP_ID
         sed -i 's/public static int APP_ID = .*/public static int APP_ID = 26333172;/' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
-        # تحديث APP_HASH
         sed -i 's/public static String APP_HASH = .*/public static String APP_HASH = "2a031a551da8ca175b0225eac8a2a131";/' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
+        
+        # طباعة محتوى BuildVars.java للتأكد من التعديل
+        echo "=== BuildVars.java after update ==="
+        cat TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java | grep -E "APP_ID|APP_HASH"
 
-    - name: Build with Gradle
+    - name: Check google-services.json
+      run: |
+        if [ -f "TMessagesProj/google-services.json" ]; then
+          echo "✅ google-services.json found"
+          cat TMessagesProj/google-services.json | head -20
+        else
+          echo "❌ google-services.json NOT found!"
+          exit 1
+        fi
+
+    - name: Check available Gradle tasks
+      run: |
+        ./gradlew tasks --no-daemon
+
+    - name: Build with Gradle (full debug)
       env:
         RELEASE_STORE_PASSWORD: android
         RELEASE_KEY_PASSWORD: android
         RELEASE_KEY_ALIAS: androidkey
-      run: ./gradlew assembleStandaloneRelease --stacktrace
+      run: |
+        # تشغيل البناء مع خيارات تصحيح شاملة
+        ./gradlew assembleStandaloneRelease --stacktrace --info --no-daemon 2>&1 | tee build.log
+        # البحث عن أي رسائل خطأ في السجل
+        echo "=== Searching for errors ==="
+        grep -i "error\|fail\|exception" build.log | head -50
 
     - name: Upload APK
       if: success()
@@ -74,3 +95,10 @@ jobs:
       with:
         name: telegram-apk
         path: TMessagesProj/build/outputs/apk/standaloneRelease/*.apk
+
+    - name: Upload build log (always)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-log
+        path: build.log
