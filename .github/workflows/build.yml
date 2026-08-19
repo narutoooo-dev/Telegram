@@ -78,14 +78,23 @@ jobs:
         # 4. التأكد من وجود الأيقونات
         echo "✅ All fixes applied - App name should now be 'Telegram'"
 
-    - name: Build with Gradle
+    - name: Build with Gradle (with full logs)
       env:
         RELEASE_STORE_PASSWORD: android
         RELEASE_KEY_PASSWORD: android
         RELEASE_KEY_ALIAS: androidkey
-      run: ./gradlew :TMessagesProj_AppStandalone:assembleRelease --stacktrace
+      run: |
+        ./gradlew clean
+        ./gradlew :TMessagesProj_AppStandalone:assembleRelease --stacktrace --info --scan 2>&1 | tee build.log
+
+    - name: Print error summary
+      if: failure()
+      run: |
+        echo "=== Looking for errors ==="
+        grep -E "error|Error|Exception|FAILED|What went wrong" build.log | head -20 || true
 
     - name: Find APK files
+      if: success()
       run: |
         echo "Searching for APK files..."
         find . -name "*.apk" -type f
@@ -101,3 +110,14 @@ jobs:
           TMessagesProj_AppStandalone/build/outputs/apk/**/*.apk
           TMessagesProj/build/outputs/apk/**/*.apk
           **/build/outputs/apk/**/*.apk
+
+    - name: Upload build logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: |
+          build.log
+          build/
+          .gradle/
+          **/build/reports/
