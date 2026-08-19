@@ -18,16 +18,17 @@ import java.util.Objects;
 
 public class BuildVars {
 
-    public static boolean DEBUG_VERSION = BuildConfig.DEBUG_VERSION;
-    public static boolean LOGS_ENABLED = BuildConfig.DEBUG_VERSION;
-    public static boolean DEBUG_PRIVATE_VERSION = BuildConfig.DEBUG_PRIVATE_VERSION;
+    public static boolean DEBUG_VERSION = true;  // ✅ تم التعديل: تفعيل وضع التطوير
+    public static boolean LOGS_ENABLED = true;   // ✅ تم التعديل: تفعيل السجلات
+    public static boolean DEBUG_PRIVATE_VERSION = true;  // ✅ تم التعديل: تفعيل الميزات الخاصة
     public static boolean USE_CLOUD_STRINGS = true;
-    public static boolean CHECK_UPDATES = true;
+    public static boolean CHECK_UPDATES = false;  // ✅ تم التعديل: إيقاف التحديثات التلقائية
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
     public static String BUILD_VERSION_STRING = BuildConfig.BUILD_VERSION_STRING;
 
     public static int APP_ID = 26333172;
     public static String APP_HASH = "2a031a551da8ca175b0225eac8a2a131";
+    public static String APPLICATION_NAME = "Telegram";  // ✅ تم التعديل: إضافة اسم التطبيق
 
     // SafetyNet key for Google Identity SDK, set it to empty to disable
     public static String SAFETYNET_KEY = "AIzaSyDqt8P-7F7CPCseMkOiVRgb1LY8RN1bvH8";

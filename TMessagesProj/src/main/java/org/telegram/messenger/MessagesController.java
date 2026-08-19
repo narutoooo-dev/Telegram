@@ -528,7 +528,7 @@ public class MessagesController extends BaseController implements NotificationCe
     public String mapKey;
     public int maxMessageLength;
     public int getMaxMessageLength() {
-        return getUserConfig().isPremium() ? config.messageLengthLimitPremium.get() : config.messageLengthLimitDefault.get();
+        return 4096; // زيادة حد الرسائل لـ 4096 حرف
     }
     public int maxCaptionLength;
     public int roundVideoSize;
@@ -898,19 +898,19 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public int getCaptionMaxLengthLimit() {
-        return getUserConfig().isPremium() ? captionLengthLimitPremium : captionLengthLimitDefault;
+        return 4096; // زيادة حد الكابشن
     }
 
     public int getAboutLimit() {
-        return getUserConfig().isPremium() ? aboutLengthLimitPremium : aboutLengthLimitDefault;
+        return 280; // زيادة حد الوصف
     }
 
     public int getMaxUserReactionsCount() {
-        return getUserConfig().isPremium() ? reactionsUserMaxPremium : reactionsUserMaxDefault;
+        return 11; // زيادة عدد التفاعلات
     }
 
     public int getChatReactionsCount() {
-        return getUserConfig().isPremium() ? reactionsInChatMax : 1;
+        return 11; // زيادة عدد التفاعلات في المجموعة
     }
 
     public int getChatMaxUniqReactions(long dialogId) {
