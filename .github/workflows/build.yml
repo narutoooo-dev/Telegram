@@ -78,23 +78,30 @@ jobs:
         # 4. التأكد من وجود الأيقونات
         echo "✅ All fixes applied - App name should now be 'Telegram'"
 
-    - name: Build with Gradle (with full logs)
+    - name: Check available tasks
+      run: |
+        echo "=== Checking available tasks ==="
+        ./gradlew :TMessagesProj_AppStandalone:tasks --all
+
+    - name: Build with Gradle (Debug)
       env:
         RELEASE_STORE_PASSWORD: android
         RELEASE_KEY_PASSWORD: android
         RELEASE_KEY_ALIAS: androidkey
       run: |
-        ./gradlew clean
-        ./gradlew :TMessagesProj_AppStandalone:assembleRelease --stacktrace --info --scan 2>&1 | tee build.log
+        echo "=== Starting Debug Build ==="
+        ./gradlew :TMessagesProj_AppStandalone:assembleDebug --stacktrace --info
 
-    - name: Print error summary
-      if: failure()
+    - name: Build with Gradle (Release)
+      env:
+        RELEASE_STORE_PASSWORD: android
+        RELEASE_KEY_PASSWORD: android
+        RELEASE_KEY_ALIAS: androidkey
       run: |
-        echo "=== Looking for errors ==="
-        grep -E "error|Error|Exception|FAILED|What went wrong" build.log | head -20 || true
+        echo "=== Starting Release Build ==="
+        ./gradlew :TMessagesProj_AppStandalone:assembleRelease --stacktrace --info
 
     - name: Find APK files
-      if: success()
       run: |
         echo "Searching for APK files..."
         find . -name "*.apk" -type f
@@ -111,8 +118,8 @@ jobs:
           TMessagesProj/build/outputs/apk/**/*.apk
           **/build/outputs/apk/**/*.apk
 
-    - name: Upload build logs
-      if: always()
+    - name: Upload build logs on failure
+      if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: build-logs
